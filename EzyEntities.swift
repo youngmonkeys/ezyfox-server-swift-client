@@ -14,11 +14,16 @@ public class EzyZone {
     public let client : EzyClient
     public let appManager: EzyAppManager
     
-    init(client : EzyClient, id: Int, name: String) {
+    public init(client : EzyClient, id: Int, name: String) {
         self.id = id;
         self.name = name;
         self.client = client;
         self.appManager = EzyAppManager(zoneName: name);
+    }
+    
+    public func getApp() -> EzyApp {
+        let app = appManager.getApp()
+        return app
     }
 }
 
@@ -37,7 +42,7 @@ public class EzyApp {
         self.dataHandlers = client.handlerManager!.getAppDataHandlers(appName: name)
     }
     
-    public func sendRequest(cmd: NSObject, data: NSObject) -> Void {
+    public func sendRequest(cmd: Any, data: NSObject) -> Void {
         let requestData = NSMutableArray()
         requestData.add(self.id);
         let requestParams = NSMutableArray()

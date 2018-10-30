@@ -52,7 +52,7 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
     public override init() {}
     
     public override func handle(event: NSDictionary) {
-        self.sendHandshakeRequest();
+        self.sendHandshakeRequest()
         self.postHandle();
     }
     
@@ -61,7 +61,7 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
     
     public func sendHandshakeRequest() -> Void {
         let request = newHandshakeRequest();
-        self.client!.sendRequest(cmd: EzyCommand.HANDSHAKE, data: request);
+        self.client!.sendRequest(cmd: EzyCommand.HANDSHAKE, data: request)
     }
     
     public func newHandshakeRequest() -> NSMutableArray {
@@ -80,20 +80,20 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
     }
     
     public func getClientKey() -> String {
-        return "";
+        return ""
     }
     
     public func getClientId() -> String {
         let uuid = UUID().uuidString
-        return uuid;
+        return uuid
     }
     
     public func isEnableEncryption() -> Bool {
-        return false;
+        return false
     }
     
     public func getStoredToken() -> String {
-        return "";
+        return ""
     }
     
 }
@@ -110,16 +110,16 @@ public class EzyConnectionFailureHandler : EzyAbstractEventHandler {
         let must = reconnectEnable && should;
         var reconnecting = false;
         if(must) {
-            reconnecting = client!.reconnect();
+            reconnecting = client!.reconnect()
         }
         if(!reconnecting) {
-            self.processWhenNoReconnect(event: event);
+            self.processWhenNoReconnect(event: event)
         }
     }
     
     public func processWhenNoReconnect(event: NSDictionary) {
-        self.client!.setStatus(status: EzyConnectionStatus.FAILURE);
-        self.control(event: event);
+        self.client!.setStatus(status: EzyConnectionStatus.FAILURE)
+        self.control(event: event)
     }
     
     public func shouldReconnect(event: NSDictionary) -> Bool {
@@ -132,7 +132,7 @@ public class EzyConnectionFailureHandler : EzyAbstractEventHandler {
 }
 
 //=======================================================
-class EzyDisconnectionHandler : EzyAbstractEventHandler {
+public class EzyDisconnectionHandler : EzyAbstractEventHandler {
     public override func handle(event: NSDictionary) -> Void {
         let reason = event["reason"] as! String
         print("handle disconnection, reason = \(reason)")
@@ -240,9 +240,9 @@ public class EzyLoginSuccessHandler : EzyAbstractDataHandler {
     
     public func handleResponseAppDatas(appDatas: NSArray) -> Void {
         let handlerManager = self.client!.handlerManager;
-        let appAccessHandler = handlerManager!.getDataHandler(cmd: EzyCommand.APP_ACCESS);
+        let appAccessHandler = handlerManager!.getDataHandler(cmd: EzyCommand.APP_ACCESS)
         for appData in appDatas {
-            appAccessHandler!.handle(data: appData as! NSArray);
+            appAccessHandler!.handle(data: appData as! NSArray)
         }
     }
     
@@ -250,7 +250,7 @@ public class EzyLoginSuccessHandler : EzyAbstractDataHandler {
     }
     
     public func handleReconnectSuccess(data: NSObject) -> Void {
-        self.handleLoginSuccess(data: data);
+        self.handleLoginSuccess(data: data)
     }
 }
 
@@ -259,20 +259,20 @@ public class EzyLoginSuccessHandler : EzyAbstractDataHandler {
 public class EzyAppAccessHandler : EzyAbstractDataHandler {
     
     public override func handle(data: NSArray) -> Void {
-        let zone = self.client!.zone;
-        let appManager = zone!.appManager;
-        let app = self.newApp(zone: zone!, data: data);
-        appManager.addApp(app: app);
-        self.client!.addApp(app: app);
-        self.postHandle(app: app, data: data);
-        print("access app: \(app.name) successfully");
+        let zone = self.client!.zone
+        let appManager = zone!.appManager
+        let app = self.newApp(zone: zone!, data: data)
+        appManager.addApp(app: app)
+        self.client!.addApp(app: app)
+        self.postHandle(app: app, data: data)
+        print("access app: \(app.name) successfully")
     }
     
     public func newApp(zone: EzyZone, data: NSArray) -> EzyApp {
-        let appId = data[0] as! Int;
-        let appName = data[1] as! String;
-        let app = EzyApp(client: client!, zone: zone, id: appId, name: appName);
-        return app;
+        let appId = data[0] as! Int
+        let appName = data[1] as! String
+        let app = EzyApp(client: client!, zone: zone, id: appId, name: appName)
+        return app
     }
     
     public func postHandle(app: EzyApp, data: NSObject) -> Void {
@@ -282,15 +282,15 @@ public class EzyAppAccessHandler : EzyAbstractDataHandler {
 
 public class EzyAppResponseHandler : EzyAbstractDataHandler {
     public override func handle(data: NSArray) -> Void {
-        let appId = data[0] as! Int;
-        let responseData = data[1] as! NSArray;
-        let cmd = responseData[0];
-        let commandData = responseData[1] as! NSObject;
+        let appId = data[0] as! Int
+        let responseData = data[1] as! NSArray
+        let cmd = responseData[0]
+        let commandData = responseData[1] as! NSObject
         
-        let app = self.client!.getAppById(appId: appId);
-        let handler = app.getDataHandler(cmd: cmd);
+        let app = self.client!.getAppById(appId: appId)
+        let handler = app.getDataHandler(cmd: cmd)
         if(handler != nil) {
-            handler!.handle(app: app, data: commandData);
+            handler!.handle(app: app, data: commandData)
         }
         else {
             print("app: \(app.name) has no handler for command: \(cmd)")
@@ -304,28 +304,31 @@ public class EzyEventHandlers {
     private let handlers : NSMutableDictionary
     
     public init(client: EzyClient) {
-        self.client = client;
-        self.handlers = NSMutableDictionary();
+        self.client = client
+        self.handlers = NSMutableDictionary()
     }
     
     public func addHandler(eventType: String, handler: EzyEventHandler) {
         let abs = handler as! EzyAbstractEventHandler
         abs.client = self.client;
-        self.handlers[eventType] = handler;
+        self.handlers[eventType] = handler
     }
     
     public func getHandler(eventType: String) -> EzyEventHandler? {
-        let handler = self.handlers[eventType];
-        return (handler as! EzyEventHandler);
+        let handler = self.handlers[eventType]
+        if(handler != nil) {
+            return (handler as! EzyEventHandler)
+        }
+        return nil
     }
     
     public func handle(eventType: String, data: NSDictionary) -> Void {
-        let handler = self.getHandler(eventType: eventType);
+        let handler = self.getHandler(eventType: eventType)
         if(handler != nil) {
-            handler!.handle(event: data);
+            handler!.handle(event: data)
         }
         else {
-            print("has no handler with event: \(eventType)");
+            print("has no handler with event: \(eventType)")
         }
     }
 }
@@ -343,22 +346,25 @@ public class EzyDataHandlers {
     
     public func addHandler(cmd: String, handler: EzyDataHandler) -> Void {
         let abs = handler as! EzyAbstractDataHandler
-        abs.client = self.client;
-        self.handlers[cmd] = handler;
+        abs.client = self.client
+        self.handlers[cmd] = handler
     }
     
     public func getHandler(cmd: String) -> EzyDataHandler? {
-        let handler = self.handlers[cmd];
-        return (handler as! EzyDataHandler);
+        let handler = self.handlers[cmd]
+        if(handler != nil) {
+            return (handler as! EzyDataHandler)
+        }
+        return nil
     }
     
     public func handle(cmd: String, data: NSArray) -> Void {
-        let handler = self.getHandler(cmd: cmd);
+        let handler = self.getHandler(cmd: cmd)
         if(handler != nil) {
-            handler!.handle(data: data);
+            handler!.handle(data: data)
         }
         else {
-            print("has no handler with command: \(cmd)");
+            print("has no handler with command: \(cmd)")
         }
     }
 }
@@ -373,12 +379,12 @@ public class EzyAppDataHandlers {
     }
     
     public func addHandler(cmd: Any, handler: EzyAppDataHandler) -> Void {
-        self.handlers[cmd] = handler;
+        self.handlers[cmd] = handler
     }
     
     public func getHandler(cmd: Any) -> EzyAppDataHandler? {
-        let handler = self.handlers[cmd];
-        return (handler as! EzyAppDataHandler);
+        let handler = self.handlers[cmd]
+        return (handler as! EzyAppDataHandler)
     }
     
 }

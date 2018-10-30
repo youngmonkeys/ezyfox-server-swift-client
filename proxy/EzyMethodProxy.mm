@@ -212,6 +212,7 @@ public:
         logger::log("events processing loop has already started");
         return;
     }
+    active = true;
     NSThread* thread = [[NSThread alloc] initWithTarget:self
                                                selector:@selector(loop)
                                                  object:nil];
@@ -366,7 +367,9 @@ public:
 @implementation EzyStartPingScheduleMethod
 
 - (NSObject *)invoke:(NSDictionary *)params {
-    [[EzyEventsProcessingLoop getInstance] start];
+    EzyClient* client = getClient(params);
+    EzyPingSchedule* pingSchedule = client->getPingSchedule();
+    pingSchedule->start();
     return [NSNumber numberWithBool:TRUE];
 }
 
@@ -379,9 +382,7 @@ public:
 @implementation EzyProcessEventsMethod
 
 - (NSObject *)invoke:(NSDictionary *)params {
-    EzyClient* client = getClient(params);
-    EzyPingSchedule* pingSchedule = client->getPingSchedule();
-    pingSchedule->start();
+    [[EzyEventsProcessingLoop getInstance] start];
     return [NSNumber numberWithBool:TRUE];
 }
 
