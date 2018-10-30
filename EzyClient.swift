@@ -37,7 +37,7 @@ public class EzyClient {
     
     public func connect(host:String, port:Int) -> Void {
         let params = NSMutableDictionary()
-        params["clientName"] = name;
+        params["clientName"] = name
         params["host"] = host
         params["port"] = port
         proxy.run("connect", params: params as! [AnyHashable : Any])
@@ -74,21 +74,21 @@ public class EzyClient {
     }
     
     public func addApp(app: EzyApp) -> Void {
-        self.appsById[app.id] = app;
+        self.appsById[app.id] = app
     }
     
     public func getAppById(appId: Int) -> EzyApp {
-        let app = self.appsById[appId] as! EzyApp;
-        return app;
+        let app = self.appsById[appId] as! EzyApp
+        return app
     }
     
     public func handleEvent(eventType: String, data: NSDictionary) -> Void {
-        let eventHandlers = self.handlerManager!.eventHandlers;
-        eventHandlers!.handle(eventType: eventType, data: data);
+        let eventHandlers = self.handlerManager!.eventHandlers
+        eventHandlers!.handle(eventType: eventType, data: data)
     }
     
     public func handleData(command: String, data: NSArray) -> Void {
-        let dataHandlers = self.handlerManager!.dataHandlers;
-        dataHandlers!.handle(cmd: command, data: data);
+        let dataHandlers = self.handlerManager!.dataHandlers
+        dataHandlers!.handle(cmd: command, data: data)
     }
 }

@@ -34,7 +34,8 @@
     EzyEventListenerBlock listener = [_eventListener valueForKey:name];
     if(listener)
         listener(body);
-    [NSException raise:NSInvalidArgumentException format:@"has no lister with event name: %@", name];
+    else
+        [NSException raise:NSInvalidArgumentException format:@"has no lister with event name: %@", name];
 }
 
 - (void)setEventListener:(NSString *)name listener:(EzyEventListenerBlock)listener {

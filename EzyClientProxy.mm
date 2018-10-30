@@ -39,7 +39,7 @@
     [self addMethod:[[EzyReconnectMethod alloc]init]];
     [self addMethod:[[EzySetStatusMethod alloc]init]];
     [self addMethod:[[EzyStartPingScheduleMethod alloc]init]];
-    [self addMethod:[[EzyStartPingScheduleMethod alloc]init]];
+    [self addMethod:[[EzyProcessEventsMethod alloc]init]];
 }
 
 -(void)addMethod:(EzyMethodProxy*)method {

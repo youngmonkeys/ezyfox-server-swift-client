@@ -17,21 +17,21 @@ public class EzySetup {
         self.appSetups = NSMutableDictionary()
     }
     
-    public func addDataHandler(cmd: String, dataHandler: EzyDataHandler) -> EzySetup {
-        self.handlerManager.addDataHandler(cmd: cmd, dataHandler: dataHandler);
+    public func addDataHandler(cmd: String, handler: EzyDataHandler) -> EzySetup {
+        self.handlerManager.addDataHandler(cmd: cmd, handler: handler)
         return self;
     }
     
-    public func addEventHandler(eventType: String, eventHandler: EzyEventHandler) -> EzySetup {
-        self.handlerManager.addEventHandler(eventType: eventType, eventHandler: eventHandler);
+    public func addEventHandler(eventType: String, handler: EzyEventHandler) -> EzySetup {
+        self.handlerManager.addEventHandler(eventType: eventType, handler: handler)
         return self;
     }
     
     public func setupApp(appName: String) -> EzyAppSetup {
-        var appSetup = self.appSetups[appName] as! EzyAppSetup?;
+        var appSetup = self.appSetups[appName] as! EzyAppSetup?
         if(appSetup == nil) {
-            let appDataHandlers = self.handlerManager.getAppDataHandlers(appName: appName);
-            appSetup = EzyAppSetup(dataHandlers: appDataHandlers, parent: self);
+            let appDataHandlers = self.handlerManager.getAppDataHandlers(appName: appName)
+            appSetup = EzyAppSetup(dataHandlers: appDataHandlers, parent: self)
             self.appSetups[appName] = appSetup;
         }
         return appSetup!;
@@ -47,8 +47,8 @@ public class EzyAppSetup {
         self.dataHandlers = dataHandlers
     }
     
-    public func addDataHandler(cmd: String, dataHandler: EzyAppDataHandler) -> EzyAppSetup {
-        self.dataHandlers.addHandler(cmd: cmd, handler: dataHandler)
+    public func addDataHandler(cmd: String, handler: EzyAppDataHandler) -> EzyAppSetup {
+        self.dataHandlers.addHandler(cmd: cmd, handler: handler)
         return self
     }
     

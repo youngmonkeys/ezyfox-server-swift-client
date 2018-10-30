@@ -9,9 +9,10 @@
 import Foundation
 
 class EzyClients {
+    private var started : Bool
     private var defaultClientName : String
     private var clients : [String : EzyClient]
-    private var proxy = EzyClientProxy.getInstance();
+    private var proxy = EzyClientProxy.getInstance()
     private static let INSTANCE = EzyClients()
     
     public static func getInstance() -> EzyClients! {
@@ -19,6 +20,7 @@ class EzyClients {
     }
     
     private init() {
+        started = false
         defaultClientName = ""
         clients = [String : EzyClient]()
     }
@@ -54,7 +56,14 @@ class EzyClients {
     }
     
     public func processEvents() -> Void {
-        addEventDataListers()
+        if(started) {
+            print("clients has already started")
+        }
+        else {
+            started = true
+            addEventDataListers()
+            startEventsLoop()
+        }
     }
     
     private func startEventsLoop() -> Void {
@@ -65,17 +74,17 @@ class EzyClients {
         let eventEmitter = EzyEventEmitter.getInstance()
         eventEmitter.setEventListener(String("ezy.event"), listener: {
             params in
-            let client = self.getClient(clientName: params["clientName"] as! String);
-            let eventType = params["eventType"] as! String;
-            let data = params["data"] as! NSDictionary;
-            client.handleEvent(eventType: eventType, data: data);
+            let client = self.getClient(clientName: params["clientName"] as! String)
+            let eventType = params["eventType"] as! String
+            let data = params["data"] as! NSDictionary
+            client.handleEvent(eventType: eventType, data: data)
         });
         eventEmitter.setEventListener(String("ezy.data"), listener: {
             params in
-            let client = self.getClient(clientName: params["clientName"] as! String);
-            let command = params["command"] as! String;
-            let data = params["data"] as! NSArray;
-            client.handleData(command: command, data: data);
+            let client = self.getClient(clientName: params["clientName"] as! String)
+            let command = params["command"] as! String
+            let data = params["data"] as! NSArray
+            client.handleData(command: command, data: data)
         });
     }
     
