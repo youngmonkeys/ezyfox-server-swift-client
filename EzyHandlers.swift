@@ -102,7 +102,7 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
 public class EzyConnectionFailureHandler : EzyAbstractEventHandler {
     public override func handle(event: NSDictionary) {
         let reason = event["reason"] as! String
-        print("connection failure, reason = \(reason)")
+        EzyLogger.warn(msg: "connection failure, reason = \(reason)")
         let config = self.client!.config
         let reconnectConfig = config["reconnect"] as! NSDictionary
         let should = self.shouldReconnect(event: event)
@@ -135,7 +135,7 @@ public class EzyConnectionFailureHandler : EzyAbstractEventHandler {
 public class EzyDisconnectionHandler : EzyAbstractEventHandler {
     public override func handle(event: NSDictionary) -> Void {
         let reason = event["reason"] as! String
-        print("handle disconnection, reason = \(reason)")
+        EzyLogger.info(msg: "handle disconnection, reason = \(reason)")
         let config = self.client!.config
         let reconnectConfig = config["reconnect"] as! NSDictionary
         let should = self.shouldReconnect(event: event)
@@ -213,7 +213,7 @@ public class EzyLoginSuccessHandler : EzyAbstractDataHandler {
         self.client!.me = user;
         self.client!.zone = zone;
         self.handleLoginSuccess(joinedApps: joinedApps, responseData: responseData);
-        print("user: \(user.name) logged in successfully");
+        EzyLogger.info(msg: "user: \(user.name) logged in successfully");
     }
     
     public func newUser(data: NSArray) -> EzyUser {
@@ -247,7 +247,7 @@ public class EzyAppAccessHandler : EzyAbstractDataHandler {
         appManager.addApp(app: app)
         self.client!.addApp(app: app)
         self.postHandle(app: app, data: data)
-        print("access app: \(app.name) successfully")
+        EzyLogger.info(msg: "access app: \(app.name) successfully")
     }
     
     public func newApp(zone: EzyZone, data: NSArray) -> EzyApp {
@@ -275,7 +275,7 @@ public class EzyAppResponseHandler : EzyAbstractDataHandler {
             handler!.handle(app: app, data: commandData)
         }
         else {
-            print("app: \(app.name) has no handler for command: \(cmd)")
+            EzyLogger.warn(msg: "app: \(app.name) has no handler for command: \(cmd)")
         }
     }
 }
@@ -310,7 +310,7 @@ public class EzyEventHandlers {
             handler!.handle(event: data)
         }
         else {
-            print("has no handler with event: \(eventType)")
+            EzyLogger.warn(msg: "has no handler with event: \(eventType)")
         }
     }
 }
@@ -346,7 +346,7 @@ public class EzyDataHandlers {
             handler!.handle(data: data)
         }
         else {
-            print("has no handler with command: \(cmd)")
+            EzyLogger.warn(msg: "has no handler with command: \(cmd)")
         }
     }
 }

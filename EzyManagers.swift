@@ -28,7 +28,7 @@ public class EzyAppManager {
             app = self.appList[0]
         }
         else {
-            print("has no app in zone: \(self.zoneName)");
+            EzyLogger.warn(msg: "has no app in zone: \(self.zoneName)");
         }
         return app as! EzyApp
     }

@@ -57,7 +57,7 @@ class EzyClients {
     
     public func processEvents() -> Void {
         if(started) {
-            print("clients has already started")
+            EzyLogger.info(msg: "clients has already started")
         }
         else {
             started = true
