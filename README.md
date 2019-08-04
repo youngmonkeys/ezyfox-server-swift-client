@@ -101,7 +101,7 @@ class ExFirstAppResponseHandler : EzyAbstractAppDataHandler<NSDictionary> {
 };
 ```
 
-**8. Logger usage **
+**8. Logger usage**
 
 You should set main thread's name first:
 
