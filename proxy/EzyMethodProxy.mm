@@ -185,7 +185,7 @@ public:
 @implementation EzyEventsProcessingLoop {
     volatile bool active;
     EzyClients* mClients;
-    std::vector<EzyClient*> mClientVector;
+    std::vector<EzyClient*> mCachedClients;
 }
 
 + (instancetype)getInstance {
@@ -201,7 +201,7 @@ public:
     self = [super init];
     if(self) {
         active = false;
-        mClientVector.clear();
+        mCachedClients.clear();
         mClients = EzyClients::getInstance();
     }
     return self;
@@ -227,9 +227,9 @@ public:
     while (active) {
         [[NSThread currentThread] setName:@"ezyfox-process-event"];
         dispatch_sync(dispatch_get_main_queue(), ^(void) {
-            self->mClients->getClients(self->mClientVector);
-            for(int i = 0 ; i < self->mClientVector.size() ; i++) {
-                EzyClient* client = self->mClientVector[i];
+            self->mClients->getClients(self->mCachedClients);
+            for(int i = 0 ; i < self->mCachedClients.size() ; i++) {
+                EzyClient* client = self->mCachedClients[i];
                 client->processEvents();
             }
         });

@@ -206,52 +206,34 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
 public class EzyLoginSuccessHandler : EzyAbstractDataHandler {
     
     public override func handle(data: NSArray) -> Void {
-        let zoneId = data[0] as! Int;
-        let zoneName = data[1] as! String;
-        let userId = data[2] as! Int64;
-        let username = data[3] as! String;
-        let joinedAppArray = data[4] as! NSArray;
+        let joinedApps = data[4] as! NSArray;
         let responseData = data[5] as! NSObject;
-        
-        let zone = EzyZone(client: self.client!, id: zoneId, name: zoneName);
-        let user = EzyUser(id: userId, name: username);
+        let user = newUser(data: data);
+        let zone = newZone(data: data);
         self.client!.me = user;
         self.client!.zone = zone;
-        let allowReconnect = self.allowReconnection();
-        let appCount = joinedAppArray.count;
-        let shouldReconnect = allowReconnect && appCount > 0;
-        self.handleResponseData(data: responseData);
-        if(shouldReconnect) {
-            self.handleResponseAppDatas(appDatas: joinedAppArray);
-            self.handleReconnectSuccess(data: responseData);
-        }
-        else {
-            self.handleLoginSuccess(data: responseData);
-        }
+        self.handleLoginSuccess(joinedApps: joinedApps, responseData: responseData);
         print("user: \(user.name) logged in successfully");
     }
     
-    public func allowReconnection() -> Bool {
-        return false;
+    public func newUser(data: NSArray) -> EzyUser {
+        let userId = data[2] as! Int64;
+        let username = data[3] as! String;
+        let user = EzyUser(id: userId, name: username);
+        return user;
     }
     
-    public func handleResponseData(data: NSObject) -> Void {
+    public func newZone(data: NSArray) -> EzyZone {
+        let zoneId = data[0] as! Int;
+        let zoneName = data[1] as! String;
+        let zone = EzyZone(client: self.client!, id: zoneId, name: zoneName);
+        return zone;
     }
     
-    public func handleResponseAppDatas(appDatas: NSArray) -> Void {
-        let handlerManager = self.client!.handlerManager;
-        let appAccessHandler = handlerManager!.getDataHandler(cmd: EzyCommand.APP_ACCESS)
-        for appData in appDatas {
-            appAccessHandler!.handle(data: appData as! NSArray)
-        }
+    public func handleLoginSuccess(joinedApps: NSArray,
+                                   responseData: NSObject) -> Void {
     }
     
-    public func handleLoginSuccess(data: NSObject) -> Void {
-    }
-    
-    public func handleReconnectSuccess(data: NSObject) -> Void {
-        self.handleLoginSuccess(data: data)
-    }
 }
 
 //=======================================================
