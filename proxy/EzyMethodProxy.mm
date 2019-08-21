@@ -45,8 +45,7 @@ static std::map<EzyCommand, std::string> sNativeCommandNames = {
     {AppExit, "APP_EXIT"},
     {AppAccessError, "APP_ACCESS_ERROR"},
     {PluginInfo, "PLUGIN_INFO"},
-    {PluginRequestByName, "PLUGIN_REQUEST_BY_NAME"},
-    {PluginRequestById, "PLUGIN_REQUEST_BY_ID"}
+    {PluginRequest, "PLUGIN_REQUEST"}
 };
 
 static std::map<std::string, EzyCommand> sNativeCommandIds = {
@@ -62,8 +61,7 @@ static std::map<std::string, EzyCommand> sNativeCommandIds = {
     {"APP_EXIT", AppExit},
     {"APP_ACCESS_ERROR", AppAccessError},
     {"PLUGIN_INFO", PluginInfo},
-    {"PLUGIN_REQUEST_BY_NAME", PluginRequestByName},
-    {"PLUGIN_REQUEST_BY_ID", PluginRequestById}
+    {"PLUGIN_REQUEST", PluginRequest}
 };
 
 static std::map<std::string, EzyConnectionStatus> sNativeConnectionStatusIds = {
@@ -228,7 +226,7 @@ public:
         [[NSThread currentThread] setName:@"ezyfox-process-event"];
         dispatch_sync(dispatch_get_main_queue(), ^(void) {
             self->mClients->getClients(self->mCachedClients);
-            for(int i = 0 ; i < self->mCachedClients.size() ; i++) {
+            for(int i = 0 ; i < self->mCachedClients.size() ; ++i) {
                 EzyClient* client = self->mCachedClients[i];
                 client->processEvents();
             }
@@ -270,11 +268,11 @@ public:
 
 -(void) setupClient:(EzyClient*)client {
     EzySetup* setup = client->setup();
-    for(int i = 1 ; i <= NUMBER_OF_EVENTS ; i++) {
+    for(int i = 1 ; i <= NUMBER_OF_EVENTS ; ++i) {
         EzyEventType eventType = (EzyEventType)i;
         setup->addEventHandler(eventType, new EzyNativeEventHandler(client));
     }
-    for(int i = 0 ; i < NUMBER_OF_COMMANDS ; i++) {
+    for(int i = 0 ; i < NUMBER_OF_COMMANDS ; ++i) {
         EzyCommand command = (EzyCommand)sCommands[i];
         setup->addDataHandler(command, new EzyNativeDataHandler(client, command));
     }
