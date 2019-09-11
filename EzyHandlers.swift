@@ -107,19 +107,15 @@ public class EzyConnectionFailureHandler : EzyAbstractEventHandler {
         let reconnectConfig = config["reconnect"] as! NSDictionary
         let should = self.shouldReconnect(event: event)
         let reconnectEnable = reconnectConfig["enable"] as! Bool
-        let must = reconnectEnable && should;
+        let mustReconnect = reconnectEnable && should;
         var reconnecting = false;
-        if(must) {
+        self.client!.setStatus(status: EzyConnectionStatus.FAILURE)
+        if(mustReconnect) {
             reconnecting = client!.reconnect()
         }
         if(!reconnecting) {
-            self.processWhenNoReconnect(event: event)
+            self.control(event: event)
         }
-    }
-    
-    public func processWhenNoReconnect(event: NSDictionary) {
-        self.client!.setStatus(status: EzyConnectionStatus.FAILURE)
-        self.control(event: event)
     }
     
     public func shouldReconnect(event: NSDictionary) -> Bool {
@@ -140,25 +136,25 @@ public class EzyDisconnectionHandler : EzyAbstractEventHandler {
         let reconnectConfig = config["reconnect"] as! NSDictionary
         let should = self.shouldReconnect(event: event)
         let reconnectEnable = reconnectConfig["enable"] as! Bool
-        let must = reconnectEnable && should;
+        let mustReconnect = reconnectEnable && should;
         var reconnecting = false;
-        if(must) {
+        self.client!.setStatus(status: EzyConnectionStatus.DISCONNECTED);
+        if(mustReconnect) {
             reconnecting = client!.reconnect();
         }
         if(!reconnecting) {
-            self.processWhenNoReconnect(event: event);
+            self.control(event: event);
         }
-    }
-    
-    public func processWhenNoReconnect(event: NSDictionary) -> Void {
-        self.client!.setStatus(status: EzyConnectionStatus.DISCONNECTED);
-        self.control(event: event);
     }
     
     public func preHandle(event: NSDictionary) -> Void {
     }
     
     public func shouldReconnect(event: NSDictionary) -> Bool {
+        let reason = event["reason"] as! String
+        if(reason == "ANOTHER_SESSION_LOGIN") {
+            return false;
+        }
         return true;
     }
     
@@ -237,6 +233,18 @@ public class EzyLoginSuccessHandler : EzyAbstractDataHandler {
 }
 
 //=======================================================
+public class EzyLoginErrorHandler : EzyAbstractDataHandler {
+    
+    public override func handle(data: NSArray) -> Void {
+        self.client!.disconnect(reason: 401);
+        self.handleLoginError(data: data);
+    }
+    
+    public func handleLoginError(data: NSArray) -> Void {
+    }
+    
+}
+//=======================================================
 
 public class EzyAppAccessHandler : EzyAbstractDataHandler {
     
@@ -245,7 +253,6 @@ public class EzyAppAccessHandler : EzyAbstractDataHandler {
         let appManager = zone!.appManager
         let app = self.newApp(zone: zone!, data: data)
         appManager.addApp(app: app)
-        self.client!.addApp(app: app)
         self.postHandle(app: app, data: data)
         EzyLogger.info(msg: "access app: \(app.name) successfully")
     }
@@ -269,7 +276,7 @@ public class EzyAppResponseHandler : EzyAbstractDataHandler {
         let cmd = responseData[0]
         let commandData = responseData[1] as! NSObject
         
-        let app = self.client!.getAppById(appId: appId)
+        let app = self.client!.getAppById(appId: appId)!
         let handler = app.getDataHandler(cmd: cmd)
         if(handler != nil) {
             handler!.handle(app: app, data: commandData)

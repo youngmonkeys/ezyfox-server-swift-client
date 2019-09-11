@@ -322,6 +322,23 @@ public:
 @end
 
 //======================================================
+@implementation EzyDisconnectMethod
+
+- (NSObject *)invoke:(NSDictionary *)params {
+    EzyClient* client = getClient(params);
+    int reason = 0;
+    if([params valueForKey:@"reason"])
+        reason = [[params valueForKey:@"reason"] intValue];
+    client->disconnect(reason);
+    return [NSNumber numberWithBool:TRUE];
+}
+
+- (NSString *)getName {
+    return METHOD_DISCONNECT;
+}
+@end
+
+//======================================================
 @implementation EzySendMethod
 
 - (NSObject *)invoke:(NSDictionary *)params {

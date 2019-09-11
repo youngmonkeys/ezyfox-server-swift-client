@@ -90,6 +90,7 @@ public class EzyHandlerManager {
         handlers.addHandler(cmd: EzyCommand.PONG, handler: EzyPongHandler())
         handlers.addHandler(cmd: EzyCommand.HANDSHAKE, handler: EzyHandshakeHandler())
         handlers.addHandler(cmd: EzyCommand.LOGIN, handler: EzyLoginSuccessHandler())
+        handlers.addHandler(cmd: EzyCommand.LOGIN_ERROR, handler: EzyLoginErrorHandler())
         handlers.addHandler(cmd: EzyCommand.APP_ACCESS, handler: EzyAppAccessHandler())
         handlers.addHandler(cmd: EzyCommand.APP_REQUEST, handler: EzyAppResponseHandler())
         return handlers;

@@ -35,6 +35,7 @@
 -(void)initMethods {
     [self addMethod:[[EzyCreateClientMethod alloc]init]];
     [self addMethod:[[EzyConnectMethod alloc]init]];
+    [self addMethod:[[EzyDisconnectMethod alloc]init]];
     [self addMethod:[[EzySendMethod alloc]init]];
     [self addMethod:[[EzyReconnectMethod alloc]init]];
     [self addMethod:[[EzySetStatusMethod alloc]init]];
