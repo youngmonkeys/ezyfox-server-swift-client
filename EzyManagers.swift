@@ -39,6 +39,16 @@ public class EzyAppManager {
         self.appsByName[app.name] = app
     }
     
+    public func removeApp(appId: Int) -> EzyApp? {
+        let app = self.appsById[appId] as? EzyApp;
+        if(app != nil) {
+            self.appList.remove(app!);
+            self.appsById.removeObject(forKey: appId);
+            self.appsByName.removeObject(forKey: app!.name)
+        }
+        return app;
+    }
+    
     public func getAppById(id: Int) -> EzyApp {
         let app = self.appsById[id]
         return app as! EzyApp
@@ -92,6 +102,7 @@ public class EzyHandlerManager {
         handlers.addHandler(cmd: EzyCommand.LOGIN, handler: EzyLoginSuccessHandler())
         handlers.addHandler(cmd: EzyCommand.LOGIN_ERROR, handler: EzyLoginErrorHandler())
         handlers.addHandler(cmd: EzyCommand.APP_ACCESS, handler: EzyAppAccessHandler())
+        handlers.addHandler(cmd: EzyCommand.APP_EXIT, handler: EzyAppExitHandler())
         handlers.addHandler(cmd: EzyCommand.APP_REQUEST, handler: EzyAppResponseHandler())
         return handlers;
     }

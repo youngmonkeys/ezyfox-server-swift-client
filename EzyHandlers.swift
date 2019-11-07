@@ -97,8 +97,8 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
     }
     
 }
-//=======================================================
 
+//=======================================================
 public class EzyConnectionFailureHandler : EzyAbstractEventHandler {
     public override func handle(event: NSDictionary) {
         let reason = event["reason"] as! String
@@ -202,13 +202,12 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
 public class EzyLoginSuccessHandler : EzyAbstractDataHandler {
     
     public override func handle(data: NSArray) -> Void {
-        let joinedApps = data[4] as! NSArray;
-        let responseData = data[5] as! NSObject;
+        let responseData = data[4] as! NSObject;
         let user = newUser(data: data);
         let zone = newZone(data: data);
         self.client!.me = user;
         self.client!.zone = zone;
-        self.handleLoginSuccess(joinedApps: joinedApps, responseData: responseData);
+        self.handleLoginSuccess(responseData: responseData);
         EzyLogger.info(msg: "user: \(user.name) logged in successfully");
     }
     
@@ -226,8 +225,7 @@ public class EzyLoginSuccessHandler : EzyAbstractDataHandler {
         return zone;
     }
     
-    public func handleLoginSuccess(joinedApps: NSArray,
-                                   responseData: NSObject) -> Void {
+    public func handleLoginSuccess(responseData: NSObject) -> Void {
     }
     
 }
@@ -244,8 +242,8 @@ public class EzyLoginErrorHandler : EzyAbstractDataHandler {
     }
     
 }
-//=======================================================
 
+//=======================================================
 public class EzyAppAccessHandler : EzyAbstractDataHandler {
     
     public override func handle(data: NSArray) -> Void {
@@ -267,8 +265,27 @@ public class EzyAppAccessHandler : EzyAbstractDataHandler {
     public func postHandle(app: EzyApp, data: NSObject) -> Void {
     }
 }
-//=======================================================
 
+//=======================================================
+public class EzyAppExitHandler : EzyAbstractDataHandler {
+    
+    public override func handle(data: NSArray) -> Void {
+        let zone = self.client!.zone
+        let appManager = zone!.appManager
+        let appId = data[0] as! Int;
+        let reasonId = data[1] as! Int;
+        let app = appManager.removeApp(appId: appId)
+        if(app != nil) {
+            self.postHandle(app: app!, data: data)
+            EzyLogger.info(msg: "user exit app: \(app!.name), reason: \(reasonId)")
+        }
+    }
+    
+    public func postHandle(app: EzyApp, data: NSObject) -> Void {
+    }
+}
+
+//=======================================================
 public class EzyAppResponseHandler : EzyAbstractDataHandler {
     public override func handle(data: NSArray) -> Void {
         let appId = data[0] as! Int
