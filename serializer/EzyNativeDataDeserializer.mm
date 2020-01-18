@@ -7,6 +7,7 @@
 //
 
 #import "EzyNativeDataDeserializer.h"
+#import "../math/EzyNSNumber.h"
 #include "EzyHeaders.h"
 
 EZY_USING_NAMESPACE::entity;
@@ -37,6 +38,11 @@ EZY_USING_NAMESPACE::entity;
         EzyPrimitive* item = [self deserializeToPrimitive:value];
         output->addItem(item);
     }
+    else if([value isKindOfClass:[EzyNSNumber class]]) {
+        EzyNSNumber* number = (EzyNSNumber*)value;
+        EzyPrimitive* item = [self deserializeToNumber:number];
+        output->addItem(item);
+    }
     else if([value isKindOfClass:[NSString class]]) {
         NSString* string = (NSString*)value;
         output->addString([string UTF8String]);
@@ -64,6 +70,11 @@ EZY_USING_NAMESPACE::entity;
         EzyPrimitive* item = [self deserializeToPrimitive:value];
         output->addItem(k, item);
     }
+    else if([value isKindOfClass:[EzyNSNumber class]]) {
+        EzyNSNumber* number = (EzyNSNumber*)value;
+        EzyPrimitive* item = [self deserializeToNumber:number];
+        output->addItem(k, item);
+    }
     else if([value isKindOfClass:[NSString class]]) {
         NSString* string = (NSString*)value;
         output->setString(k, [string UTF8String]);
@@ -84,6 +95,30 @@ EZY_USING_NAMESPACE::entity;
                                      userInfo:nil];
     }
 }
+
+-(EzyPrimitive*)deserializeToNumber:(EzyNSNumber*)value {
+    EzyPrimitive* item = new EzyPrimitive();
+    switch ([value getType]) {
+        case NUMBER_TYPE_BOOL:
+            item->setBool([value boolValue]);
+            break;
+        case NUMBER_TYPE_DOUBLE:
+            item->setDouble([value doubleValue]);
+            break;
+        case NUMBER_TYPE_FLOAT:
+            item->setFloat([value floatValue]);
+            break;
+        case NUMBER_TYPE_INT:
+            item->setInt([value intValue]);
+            break;
+        case NUMBER_TYPE_UINT:
+            item->setInt([value uintValue]);
+            break;
+        default:
+            break;
+    }
+    return item;
+};
 
 -(EzyPrimitive*)deserializeToPrimitive:(NSObject*)value {
     NSNumber* number = (NSNumber*)value;

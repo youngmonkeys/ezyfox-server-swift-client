@@ -10,5 +10,6 @@
 #define hello_swift_Bridging_Header_h_h
 
 #import "EzyClientProxy.h"
+#import "math/EzyNSNumber.h"
 
 #endif /* hello_swift_Bridging_Header_h_h */

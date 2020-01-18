@@ -74,7 +74,7 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
         request.add(clientKey)
         request.add(clientType)
         request.add(clientVersion)
-        request.add(enableEncryption)
+        request.add(EzyNSNumber(bool: enableEncryption));
         request.add(token)
         return request
     }
