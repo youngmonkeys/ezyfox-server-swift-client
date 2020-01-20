@@ -293,13 +293,17 @@ public class EzyAppResponseHandler : EzyAbstractDataHandler {
         let cmd = responseData[0]
         let commandData = responseData[1] as! NSObject
         
-        let app = self.client!.getAppById(appId: appId)!
-        let handler = app.getDataHandler(cmd: cmd)
+        let app = self.client?.getAppById(appId: appId)!
+        if(app == nil) {
+            EzyLogger.info(msg: "receive message when has not joined app yet");
+            return;
+        }
+        let handler = app!.getDataHandler(cmd: cmd)
         if(handler != nil) {
-            handler!.handle(app: app, data: commandData)
+            handler!.handle(app: app!, data: commandData)
         }
         else {
-            EzyLogger.warn(msg: "app: \(app.name) has no handler for command: \(cmd)")
+            EzyLogger.warn(msg: "app: \(app!.name) has no handler for command: \(cmd)")
         }
     }
 }
