@@ -101,8 +101,9 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
 //=======================================================
 public class EzyConnectionFailureHandler : EzyAbstractEventHandler {
     public override func handle(event: NSDictionary) {
-        let reason = event["reason"] as! String
-        EzyLogger.warn(msg: "connection failure, reason = \(reason)")
+        let reason = event["reason"] as! Int
+        let reasonName = EzyConnectionFailedReasons.getConnectionFailedReasonName(reasonId: reason)
+        EzyLogger.warn(msg: "connection failure, reason = \(reasonName)")
         let config = self.client!.config
         let reconnectConfig = config["reconnect"] as! NSDictionary
         let should = self.shouldReconnect(event: event)
@@ -130,13 +131,18 @@ public class EzyConnectionFailureHandler : EzyAbstractEventHandler {
 //=======================================================
 public class EzyDisconnectionHandler : EzyAbstractEventHandler {
     public override func handle(event: NSDictionary) -> Void {
-        let reason = event["reason"] as! String
-        EzyLogger.info(msg: "handle disconnection, reason = \(reason)")
+        let reason = event["reason"] as! Int
+        let reasonName = EzyDisconnectReasons.getDisconnectReasonName(reasonId: reason)
+        EzyLogger.info(msg: "handle disconnection, reason = \(reasonName)")
+        preHandle(event: event)
         let config = self.client!.config
         let reconnectConfig = config["reconnect"] as! NSDictionary
         let should = self.shouldReconnect(event: event)
         let reconnectEnable = reconnectConfig["enable"] as! Bool
-        let mustReconnect = reconnectEnable && should;
+        let mustReconnect = reconnectEnable &&
+            reason != EzyDisconnectReason.UNAUTHORIZED &&
+            reason != EzyDisconnectReason.CLOSE &&
+            should;
         var reconnecting = false;
         self.client!.setStatus(status: EzyConnectionStatus.DISCONNECTED);
         if(mustReconnect) {
@@ -151,14 +157,17 @@ public class EzyDisconnectionHandler : EzyAbstractEventHandler {
     }
     
     public func shouldReconnect(event: NSDictionary) -> Bool {
-        let reason = event["reason"] as! String
-        if(reason == "ANOTHER_SESSION_LOGIN") {
+        let reason = event["reason"] as! Int
+        if(reason == EzyDisconnectReason.ANOTHER_SESSION_LOGIN) {
             return false;
         }
         return true;
     }
     
     public func control(event : NSDictionary) -> Void {
+    }
+    
+    public func postHandle(event: NSDictionary) -> Void {
     }
 }
 

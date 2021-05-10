@@ -48,7 +48,7 @@ public class EzyClient {
         return result as! Bool
     }
     
-    public func disconnect(reason:Int) -> Void {
+    public func disconnect(reason:Int = EzyDisconnectReason.CLOSE) -> Void {
         let params = NSMutableDictionary()
         params["reason"] = reason;
         proxy.run("disconnect", params: params as! [AnyHashable : Any])
@@ -75,6 +75,15 @@ public class EzyClient {
         params["clientName"] = name
         params["status"] = status
         proxy.run("setStatus", params: params as! [AnyHashable : Any])
+    }
+    
+    public func getApp() -> EzyApp? {
+        if(zone != nil) {
+            let appManager = zone!.appManager;
+            let app = appManager.getApp()
+            return app;
+        }
+        return nil;
     }
     
     public func getAppById(appId: Int) -> EzyApp? {

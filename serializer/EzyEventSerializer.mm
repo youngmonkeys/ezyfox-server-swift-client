@@ -10,27 +10,6 @@
 #include "EzyHeaders.h"
 
 EZY_USING_NAMESPACE::event;
-EZY_USING_NAMESPACE::constant;
-
-static std::map<int, std::string> sNativeConnectionFailedReasonNames = {
-    {NetworkUnreachable, "NETWORK_UNREACHABLE"},
-    {UnknownHost, "UNKNOWN_HOST"},
-    {ConnectionRefused, "CONNECTION_REFUSED"},
-    {UnknownFailure, "UNKNOWN"}
-};
-
-static std::map<int, std::string> sNativeDisconnectReasonNames = {
-    {UnknownDisconnection, "UNKNOWN"},
-    {Idle, "IDLE"},
-    {NotLoggedIn, "NOT_LOGGED_IN"},
-    {AnotherSessionLogin, "ANOTHER_SESSION_LOGIN"},
-    {AdminBan, "ADMIN_BAN"},
-    {AdminKick, "ADMIN_KICK"},
-    {MaxRequestPerSecond, "MAX_REQUEST_PER_SECOND"},
-    {MaxRequestSize, "MAX_REQUEST_SIZE"},
-    {ServerError, "SERVER_ERROR"},
-    {ServerNotResponding, "SERVER_NOT_RESPONDING"}
-};
 
 @implementation EzyEventSerializer
 
@@ -56,18 +35,16 @@ static std::map<int, std::string> sNativeDisconnectReasonNames = {
 -(NSDictionary*)serializeConnectionFailureEvent: (EzyEvent*)event {
     EzyConnectionFailureEvent* mevent = (EzyConnectionFailureEvent*)event;
     NSDictionary* dict = [NSMutableDictionary dictionary];
-    std::string reasonName = sNativeConnectionFailedReasonNames[mevent->getReason()];
-    NSString* tmp = [NSString stringWithCString:reasonName.c_str() encoding:[NSString defaultCStringEncoding]];
-    [dict setValue:tmp forKey:@"reason"];
+    NSNumber* reasonId = [NSNumber numberWithInt: mevent->getReason()];
+    [dict setValue:reasonId forKey:@"reason"];
     return dict;
 }
 
 -(NSDictionary*)serializeDisconnectionEvent: (EzyEvent*)event {
     EzyDisconnectionEvent* mevent = (EzyDisconnectionEvent*)event;
     NSDictionary* dict = [NSMutableDictionary dictionary];
-    std::string reasonName = sNativeDisconnectReasonNames[mevent->getReason()];
-    NSString* tmp = [NSString stringWithCString:reasonName.c_str() encoding:[NSString defaultCStringEncoding]];
-    [dict setValue:tmp forKey:@"reason"];
+    NSNumber* reasonId = [NSNumber numberWithInt: mevent->getReason()];
+    [dict setValue:reasonId forKey:@"reason"];
     return dict;
 }
 
