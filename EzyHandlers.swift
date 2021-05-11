@@ -336,7 +336,7 @@ public class EzyEventHandlers {
     public func getHandler(eventType: String) -> EzyEventHandler? {
         let handler = self.handlers[eventType]
         if(handler != nil) {
-            return (handler as! EzyEventHandler)
+            return (handler as? EzyEventHandler)
         }
         return nil
     }
@@ -372,7 +372,7 @@ public class EzyDataHandlers {
     public func getHandler(cmd: String) -> EzyDataHandler? {
         let handler = self.handlers[cmd]
         if(handler != nil) {
-            return (handler as! EzyDataHandler)
+            return (handler as? EzyDataHandler)
         }
         return nil
     }
@@ -403,7 +403,7 @@ public class EzyAppDataHandlers {
     
     public func getHandler(cmd: Any) -> EzyAppDataHandler? {
         let handler = self.handlers[cmd]
-        return (handler as! EzyAppDataHandler)
+        return (handler as? EzyAppDataHandler)
     }
     
 }
