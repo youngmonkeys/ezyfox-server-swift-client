@@ -42,18 +42,18 @@ public class EzyApp {
         self.dataHandlers = client.handlerManager!.getAppDataHandlers(appName: name)
     }
     
-    public func sendReqest(cmd: Any) -> Void {
-        sendRequest(cmd: cmd, data: NSMutableDictionary());
+    public func send(cmd: Any) -> Void {
+        send(cmd: cmd, data: NSMutableDictionary());
     }
     
-    public func sendRequest(cmd: Any, data: NSObject) -> Void {
+    public func send(cmd: Any, data: NSObject) -> Void {
         let requestData = NSMutableArray()
         requestData.add(self.id);
         let requestParams = NSMutableArray()
         requestParams.add(cmd)
         requestParams.add(data)
         requestData.add(requestParams)
-        self.client.sendRequest(cmd: EzyCommand.APP_REQUEST, data: requestData)
+        self.client.send(cmd: EzyCommand.APP_REQUEST, data: requestData)
     }
     
     public func getDataHandler(cmd: Any) -> EzyAppDataHandler? {

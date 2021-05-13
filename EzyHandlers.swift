@@ -61,7 +61,7 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
     
     public func sendHandshakeRequest() -> Void {
         let request = newHandshakeRequest();
-        self.client!.sendRequest(cmd: EzyCommand.HANDSHAKE, data: request)
+        self.client!.send(cmd: EzyCommand.HANDSHAKE, data: request)
     }
     
     public func newHandshakeRequest() -> NSMutableArray {
@@ -190,7 +190,7 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
     
     public func handleLogin() -> Void {
         let loginRequest = self.getLoginRequest();
-        self.client!.sendRequest(cmd: EzyCommand.LOGIN, data: loginRequest);
+        self.client!.send(cmd: EzyCommand.LOGIN, data: loginRequest);
     }
     
     public func getLoginRequest() -> NSArray {

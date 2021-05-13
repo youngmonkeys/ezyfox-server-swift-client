@@ -54,7 +54,7 @@ public class EzyClient {
         proxy.run("disconnect", params: params as! [AnyHashable : Any])
     }
     
-    public func sendRequest(cmd: String, data: NSArray) -> Void {
+    public func send(cmd: String, data: NSArray) -> Void {
         let params = NSMutableDictionary()
         params["clientName"] = name
         let requestParams = NSMutableDictionary()
