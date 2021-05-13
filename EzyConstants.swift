@@ -24,8 +24,7 @@ public final class EzyCommand {
     public static let APP_ACCESS_ERROR = "APP_ACCESS_ERROR"
     public static let APP_REQUEST_ERROR = "APP_REQUEST_ERROR"
     public static let PLUGIN_INFO = "PLUGIN_INFO"
-    public static let PLUGIN_REQUEST_BY_NAME = "PLUGIN_REQUEST_BY_NAME"
-    public static let PLUGIN_REQUEST_BY_ID = "PLUGIN_REQUEST_BY_ID"
+    public static let PLUGIN_REQUEST = "PLUGIN_REQUEST"
 }
 
 public final class EzyEventType {
