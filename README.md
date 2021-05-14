@@ -5,46 +5,53 @@ swift client for ezyfox server
 
 swift client for ezyfox server
 
+# Documentation
+
+[https://youngmonkeys.org/ezyfox-swift-client-sdk/](https://youngmonkeys.org/ezyfox-swift-client-sdk/)
+
+# Using by
+
+- [freechat](https://github.com/youngmonkeys/freechat)
+
 # Code Example
 
 **1. Create a TCP Client**
 
 ```swift
-let clients = EzyClients.getInstance()!;
 let config = NSMutableDictionary()
-config["clientName"] = "first";
-config["zoneName"] = "freechat"
-client = clients.newDefaultClient(config: config)
+config["clientName"] = ZONE_APP_NAME
+let clients = EzyClients.getInstance()!
+client = clients.newClient(config: config)
 ```
 
 **2. Setup client**
 
 ```swift
-let setup = client!.setup!
-.addEventHandler(eventType: EzyEventType.CONNECTION_SUCCESS, handler: EzyConnectionSuccessHandler())
-.addEventHandler(eventType: EzyEventType.CONNECTION_FAILURE, handler: EzyConnectionFailureHandler())
-.addDataHandler(cmd: EzyCommand.LOGIN, handler: ExLoginSuccessHandler())
-.addDataHandler(cmd: EzyCommand.APP_ACCESS, handler: ExAppAccessHandler())
-let handshaker = ExHandshakeHandler(username: username, password: password)
-_ = client!.setup!
-    .addDataHandler(cmd: EzyCommand.HANDSHAKE, handler: handshaker)
+ let setup = client.setup!
+    .addEventHandler(eventType: EzyEventType.CONNECTION_SUCCESS, handler: EzyConnectionSuccessHandler())
+    .addEventHandler(eventType: EzyEventType.CONNECTION_FAILURE, handler: EzyConnectionFailureHandler())
+    .addEventHandler(eventType: EzyEventType.DISCONNECTION, handler: ExDisconnectionHandler())
+    .addDataHandler(cmd: EzyCommand.LOGIN, handler: ExLoginSuccessHandler())
+    .addDataHandler(cmd: EzyCommand.APP_ACCESS, handler: ExAppAccessHandler())
+    .addDataHandler(cmd: EzyCommand.HANDSHAKE, handler: ExHandshakeHandler())
 ```
 
 **3. Setup app**
 
 ```swift
-_ = setup.setupApp(appName: "freechat")
-    .addDataHandler(cmd: "5", handler: ExFirstAppResponseHandler())
+ = setup.setupApp(appName: ZONE_APP_NAME)
+    .addDataHandler(cmd: Commands.GET_CONTACTS, handler: GetContactsResponseHandler())
+    .addDataHandler(cmd: Commands.SEARCH_EXISTED_CONTACTS, handler: SearchExistedContactsResponseHandler())
+    .addDataHandler(cmd: Commands.SUGGEST_CONTACTS, handler: SuggestContactsResponseHandler())
 ```
 
 **4. Connect to server**
 
 ```swift
-let host = "localhost"
-client!.connect(host: host, port: 3005)
+client.connect(host: host, port: 3005)
 ```
 
-**5. Handle socket's events on main thread**
+**5. Run event loop**
 
 ```swift
 clients.processEvents()
@@ -53,52 +60,11 @@ clients.processEvents()
 **6. Custom event handler**
 
 ```swift
-class ExHandshakeHandler : EzyHandshakeHandler {
-    private let username : String
-    private let password : String
-    
-    public init(username: String, password: String) {
-        self.username = username
-        self.password = password
+class ExDisconnectionHandler: EzyDisconnectionHandler {
+    override func postHandle(event: NSDictionary) {
+        // do something here
     }
-    
-    override func getLoginRequest() -> NSArray {
-        let array = NSMutableArray()
-        array.add("freechat")
-        array.add(username)
-        array.add(password)
-        return array
-    }
-};
-
-class ExLoginSuccessHandler : EzyLoginSuccessHandler {
-    override func handleLoginSuccess(joinedApps: NSArray, responseData: NSObject) {
-        let array = NSMutableArray()
-        array.add("freechat")
-        array.add(NSDictionary())
-        client!.sendRequest(cmd: EzyCommand.APP_ACCESS, data: array)
-    }
-};
-
-class ExAppAccessHandler : EzyAppAccessHandler {
-    override func postHandle(app: EzyApp, data: NSObject) -> Void {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-        let contactView = storyboard.instantiateViewController(withIdentifier: "contactView") as! ContactViewController
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        appDelegate.window?.rootViewController = contactView
-    }
-};
-```
-**7. Custom app's data handler**
-
-```swift
-class ExFirstAppResponseHandler : EzyAbstractAppDataHandler<NSDictionary> {
-    override func process(app: EzyApp, data: NSDictionary) {
-        let mvc = Mvc.getInstance()
-        let controller = mvc?.getController(name: "contact")
-        controller?.updateViews(action: "init", component: "contacts", data: data)
-    }
-};
+}
 ```
 
 **8. Logger usage**
