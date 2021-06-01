@@ -10,18 +10,25 @@ import Foundation
 
 public class EzyClient {
     
+    public let enableSSL    : Bool
     public let config       : NSDictionary
     public let name         : String
     public var zone         : EzyZone?
     public var me           : EzyUser?
     public var setup        : EzySetup?
     public var handlerManager : EzyHandlerManager?
+    public var privateKey: String?
     private let proxy = EzyClientProxy.getInstance()
+    
+    public convenience init(config: EzyClientConfig) {
+        self.init(config: config.toDictionary())
+    }
     
     public init(config: NSDictionary) {
         let result = proxy.run("init", params: config as! [AnyHashable : Any])
         self.config = result as! NSDictionary;
         self.name = self.config["clientName"] as! String
+        self.enableSSL = config["enableSSL"] as! Bool
         self.zone = nil
         self.me = nil
         self.setup = nil

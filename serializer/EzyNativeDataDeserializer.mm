@@ -8,6 +8,7 @@
 
 #import "EzyNativeDataDeserializer.h"
 #import "../math/EzyNSNumber.h"
+#import "../util/NSByteArray.h"
 #include "EzyHeaders.h"
 
 EZY_USING_NAMESPACE::entity;
@@ -46,6 +47,10 @@ EZY_USING_NAMESPACE::entity;
     else if([value isKindOfClass:[NSString class]]) {
         NSString* string = (NSString*)value;
         output->addString([string UTF8String]);
+    }
+    else if([value isKindOfClass:[NSByteArray class]]) {
+        NSByteArray* byteArray = (NSByteArray*)value;
+        output->addByteArray(std::string((char*)byteArray.data.bytes, byteArray.size));
     }
     else if([value isKindOfClass:[NSArray class]]) {
         NSArray* array = (NSArray*)value;

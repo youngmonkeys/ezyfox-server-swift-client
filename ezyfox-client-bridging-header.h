@@ -10,6 +10,8 @@
 #define hello_swift_Bridging_Header_h_h
 
 #import "EzyClientProxy.h"
+#import "EzyEncryptionProxy.h"
 #import "math/EzyNSNumber.h"
+#import "util/NSByteArray.h"
 
 #endif /* hello_swift_Bridging_Header_h_h */

@@ -66,30 +66,31 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
     
     public func newHandshakeRequest() -> NSMutableArray {
         let clientId = self.getClientId()
-        let clientKey = self.getClientKey()
-        let enableEncryption = self.isEnableEncryption()
+        let clientKey = self.generateClientKey()
+        let enableEncryption = self.client!.enableSSL
         let token = self.getStoredToken()
         let request = NSMutableArray()
         request.add(clientId)
-        request.add(clientKey)
+        request.add(clientKey as Any)
         request.add(clientType)
         request.add(clientVersion)
-        request.add(EzyNSNumber(bool: enableEncryption));
+        request.add(EzyNSNumber(bool: enableEncryption))
         request.add(token)
         return request
     }
     
-    public func getClientKey() -> String {
-        return ""
+    public func generateClientKey() -> String? {
+        if(client!.enableSSL) {
+            let keyPair = EzyRSAProxy.getInstance().generateKeyPair()
+            client?.privateKey = keyPair.privateKey
+            return keyPair.publicKey;
+        }
+        return nil
     }
     
     public func getClientId() -> String {
         let uuid = UUID().uuidString
         return uuid
-    }
-    
-    public func isEnableEncryption() -> Bool {
-        return false
     }
     
     public func getStoredToken() -> String {
@@ -181,8 +182,15 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
     
     public override func handle(data: NSArray) -> Void {
         self.startPing();
+        self.doHandle(data: data)
         self.handleLogin();
         self.postHandle(data: data);
+    }
+    
+    public func doHandle(data: NSArray) -> Void {
+        let privateKey = client?.privateKey
+        let encyptedSessionKey = data[3]
+        let sessionKey = EzyRSAProxy.getInstance().decrypt(encyptedSessionKey as! NSByteArray, privateKey: privateKey!)
     }
     
     public func postHandle(data: NSArray) -> Void {

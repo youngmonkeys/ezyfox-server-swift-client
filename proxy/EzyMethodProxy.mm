@@ -253,8 +253,6 @@ public:
 -(void)validate:(NSDictionary *)params {
     if(!params)
         [NSException raise:NSInvalidArgumentException format:@"the config is null, can't create an client"];
-    if(![params objectForKey: @"zoneName"])
-        [NSException raise:NSInvalidArgumentException format:@"must specific zone name"];
 }
 
 -(NSObject*)invoke:(NSDictionary *)params {
