@@ -62,6 +62,9 @@ EZY_USING_NAMESPACE::entity;
         EzyObject* fobject = (EzyObject*)[self fromReadableMap:dict];
         output->addObject(fobject);
     }
+    else if([value isKindOfClass:[NSNull class]]) {
+        output->addNull();
+    }
     else {
         @throw [NSException exceptionWithName:@"NSInvalidArgumentException"
                                        reason: [NSString stringWithFormat:@"has no deserializer for value: %@", value]

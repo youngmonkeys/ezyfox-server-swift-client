@@ -182,15 +182,36 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
     
     public override func handle(data: NSArray) -> Void {
         self.startPing();
-        self.doHandle(data: data)
-        self.handleLogin();
+        if(self.doHandle(data: data)) {
+            self.handleLogin()
+        }
         self.postHandle(data: data);
     }
     
-    public func doHandle(data: NSArray) -> Void {
+    public func doHandle(data: NSArray) -> Bool {
+        client?.sessionToken = data[1] as? String
+        client?.sessionId = data[2] as? Int64
+        if(client!.enableSSL) {
+            let sessionKey = decrypteSessionKey(encyptedSessionKey: data[3]);
+            if(sessionKey == nil) {
+                return false;
+            }
+            client!.setSessionKey(sessionKey: sessionKey!)
+        }
+        return true;
+    }
+    
+    public func decrypteSessionKey(encyptedSessionKey: Any) -> Data? {
+        if(encyptedSessionKey is NSNull) {
+            if(client!.enableDebug) {
+                return Data()
+            }
+            EzyLogger.error(msg: "maybe server was not enable SSL, you must enable SSL on server or disable SSL on your client or enable debug mode");
+            client?.close()
+            return nil
+        }
         let privateKey = client?.privateKey
-        let encyptedSessionKey = data[3]
-        let sessionKey = EzyRSAProxy.getInstance().decrypt(encyptedSessionKey as! NSByteArray, privateKey: privateKey!)
+        return EzyRSAProxy.getInstance().decrypt(encyptedSessionKey as! NSByteArray, privateKey: privateKey!)
     }
     
     public func postHandle(data: NSArray) -> Void {
@@ -198,7 +219,11 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
     
     public func handleLogin() -> Void {
         let loginRequest = self.getLoginRequest();
-        self.client!.send(cmd: EzyCommand.LOGIN, data: loginRequest);
+        self.client!.send(cmd: EzyCommand.LOGIN, data: loginRequest, encrypted: encryptedLoginRequest());
+    }
+    
+    public func encryptedLoginRequest() -> Bool {
+        return false;
     }
     
     public func getLoginRequest() -> NSArray {

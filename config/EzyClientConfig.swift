@@ -12,6 +12,7 @@ public class EzyClientConfig {
     var enableSSL: Bool?
     var clientName: String?
     var zoneName: String?
+    var enableDebug: Bool?
     
     func setClientName(clientName: String) -> EzyClientConfig {
         self.clientName = clientName
@@ -23,8 +24,13 @@ public class EzyClientConfig {
         return self
     }
     
-    func setEnableSSL(enableSSL: Bool) -> EzyClientConfig {
+    func setEnableSSL(enableSSL: Bool = true) -> EzyClientConfig {
         self.enableSSL = enableSSL
+        return self
+    }
+    
+    func setEnableDebug(enableDebug: Bool = true) -> EzyClientConfig {
+        self.enableDebug = enableDebug;
         return self
     }
     
@@ -43,6 +49,7 @@ public class EzyClientConfig {
         dict["clientName"] = getClientName()
         dict["zoneName"] = zoneName
         dict["enableSSL"] = enableSSL
+        dict["enableDebug"] = enableDebug
         return dict
     }
     

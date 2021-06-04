@@ -11,13 +11,17 @@ import Foundation
 public class EzyClient {
     
     public let enableSSL    : Bool
+    public let enableDebug  : Bool
     public let config       : NSDictionary
     public let name         : String
     public var zone         : EzyZone?
     public var me           : EzyUser?
     public var setup        : EzySetup?
     public var handlerManager : EzyHandlerManager?
-    public var privateKey: String?
+    public var privateKey   : String?
+    public var sessionId    : Int64?
+    public var sessionToken : String?
+    public var sessionKey   : Data?
     private let proxy = EzyClientProxy.getInstance()
     
     public convenience init(config: EzyClientConfig) {
@@ -28,7 +32,8 @@ public class EzyClient {
         let result = proxy.run("init", params: config as! [AnyHashable : Any])
         self.config = result as! NSDictionary;
         self.name = self.config["clientName"] as! String
-        self.enableSSL = config["enableSSL"] as! Bool
+        self.enableSSL = config["enableSSL"] != nil ? config["enableSSL"] as! Bool : false
+        self.enableDebug = config["enableDebug"] != nil ? config["enableDebug"] as! Bool : false
         self.zone = nil
         self.me = nil
         self.setup = nil
@@ -41,6 +46,8 @@ public class EzyClient {
     }
     
     public func connect(host:String, port:Int) -> Void {
+        self.privateKey = nil;
+        self.sessionKey = nil;
         let params = NSMutableDictionary()
         params["clientName"] = name
         params["host"] = host
@@ -49,6 +56,8 @@ public class EzyClient {
     }
     
     public func reconnect() -> Bool {
+        self.privateKey = nil;
+        self.sessionKey = nil;
         let params = NSMutableDictionary()
         params["clientName"] = name
         let result = proxy.run("reconnect", params: params as! [AnyHashable : Any])
@@ -57,16 +66,34 @@ public class EzyClient {
     
     public func disconnect(reason:Int = EzyDisconnectReason.CLOSE) -> Void {
         let params = NSMutableDictionary()
-        params["reason"] = reason;
+        params["clientName"] = name
+        params["reason"] = reason
         proxy.run("disconnect", params: params as! [AnyHashable : Any])
     }
     
-    public func send(cmd: String, data: NSArray) -> Void {
+    public func close() -> Void {
+        disconnect();
+    }
+    
+    public func send(cmd: String, data: NSArray, encrypted: Bool = false) -> Void {
+        var shouldEncrypted = encrypted;
+        if(encrypted && sessionKey == nil) {
+            if(enableDebug) {
+                shouldEncrypted = false;
+            }
+            else {
+                EzyLogger.error(msg: "can not send command: " + cmd + " you must enable SSL " +
+                                     "or enable debug mode by configuration when you create the client")
+                return;
+            }
+            
+        }
         let params = NSMutableDictionary()
         params["clientName"] = name
         let requestParams = NSMutableDictionary()
         requestParams["command"] = cmd
         requestParams["data"] = data
+        requestParams["encrypted"] = shouldEncrypted
         params["request"] = requestParams
         proxy.run("send", params: params as! [AnyHashable : Any])
     }
@@ -82,6 +109,14 @@ public class EzyClient {
         params["clientName"] = name
         params["status"] = status
         proxy.run("setStatus", params: params as! [AnyHashable : Any])
+    }
+    
+    public func setSessionKey(sessionKey: Data) -> Void {
+        self.sessionKey = sessionKey;
+        let params = NSMutableDictionary()
+        params["clientName"] = name
+        params["sessionKey"] = sessionKey
+        proxy.run("setSessionKey", params: params as! [AnyHashable : Any])
     }
     
     public func getApp() -> EzyApp? {

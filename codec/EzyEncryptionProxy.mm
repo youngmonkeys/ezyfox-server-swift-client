@@ -38,15 +38,18 @@ EZY_USING_NAMESPACE::codec;
     return [EzyKeyPairProxy
             keyPairWith:[NSString stringWithCString:keyPair->getPublicKey().c_str()
                                            encoding: [NSString defaultCStringEncoding]]
-            privateKey:[NSString stringWithCString:keyPair->getEncodedPrivateKey().c_str()
+            privateKey:[NSString stringWithCString:keyPair->getPrivateKey().c_str()
                                           encoding: [NSString defaultCStringEncoding]]];
 }
 
--(NSString*)decrypt:(NSByteArray *)message privateKey:(NSString *)privateKey {
-    std::string decryption = EzyRSA::getInstance()->decrypt((char*)message.data.bytes,
+-(NSData*)decrypt:(NSByteArray *)message privateKey:(NSString *)privateKey {
+    int decryptedSize = 0;
+    char* decryption = EzyRSA::getInstance()->decrypt((char*)message.data.bytes,
                                                             message.size,
-                                                            [privateKey UTF8String]);
-    return [NSString stringWithCString:decryption.c_str()
-                              encoding:[NSString defaultCStringEncoding]];
+                                                            [privateKey UTF8String],
+                                                            decryptedSize);
+    NSData* answer = [NSData dataWithBytes:decryption length:decryptedSize];
+    EZY_SAFE_FREE(decryption);
+    return answer;
 }
 @end
