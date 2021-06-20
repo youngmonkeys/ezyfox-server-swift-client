@@ -34,6 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface EzySetStatusMethod : EzyMethodProxy
 @end
 
+@interface EzySetSessionKeyMethod : EzyMethodProxy
+@end
+
 @interface EzyStartPingScheduleMethod : EzyMethodProxy
 @end
 

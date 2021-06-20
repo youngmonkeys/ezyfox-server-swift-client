@@ -8,6 +8,7 @@
 
 #import "EzyNativeDataDeserializer.h"
 #import "../math/EzyNSNumber.h"
+#import "../util/NSByteArray.h"
 #include "EzyHeaders.h"
 
 EZY_USING_NAMESPACE::entity;
@@ -47,6 +48,10 @@ EZY_USING_NAMESPACE::entity;
         NSString* string = (NSString*)value;
         output->addString([string UTF8String]);
     }
+    else if([value isKindOfClass:[NSByteArray class]]) {
+        NSByteArray* byteArray = (NSByteArray*)value;
+        output->addByteArray(std::string((char*)byteArray.data.bytes, byteArray.size));
+    }
     else if([value isKindOfClass:[NSArray class]]) {
         NSArray* array = (NSArray*)value;
         EzyArray* farray = (EzyArray*)[self fromReadableArray:array];
@@ -56,6 +61,9 @@ EZY_USING_NAMESPACE::entity;
         NSDictionary* dict = (NSDictionary*)value;
         EzyObject* fobject = (EzyObject*)[self fromReadableMap:dict];
         output->addObject(fobject);
+    }
+    else if([value isKindOfClass:[NSNull class]]) {
+        output->addNull();
     }
     else {
         @throw [NSException exceptionWithName:@"NSInvalidArgumentException"

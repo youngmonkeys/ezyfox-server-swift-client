@@ -253,8 +253,6 @@ public:
 -(void)validate:(NSDictionary *)params {
     if(!params)
         [NSException raise:NSInvalidArgumentException format:@"the config is null, can't create an client"];
-    if(![params objectForKey: @"zoneName"])
-        [NSException raise:NSInvalidArgumentException format:@"must specific zone name"];
 }
 
 -(NSObject*)invoke:(NSDictionary *)params {
@@ -353,9 +351,10 @@ public:
     EzyClient* client = getClient(params);
     NSString* cmd = [request objectForKey:@"command"];
     NSArray* data = [request objectForKey:@"data"];
+    NSNumber* encrypted = [request objectForKey:@"encrypted"];
     EzyArray* array = (EzyArray*)[EzyNativeSerializers fromReadableArray:data];
     EzyCommand command = sNativeCommandIds[[cmd UTF8String]];
-    client->send(command, array);
+    client->send(command, array, encrypted.boolValue);
     return [NSNumber numberWithBool:TRUE];
 }
 
@@ -377,6 +376,22 @@ public:
 
 - (NSString *)getName {
     return METHOD_SET_STATUS;
+}
+@end
+
+//======================================================
+@implementation EzySetSessionKeyMethod
+
+- (NSObject *)invoke:(NSDictionary *)params {
+    EzyClient* client = getClient(params);
+    NSData* sessionKeyData = [params valueForKey:@"sessionKey"];
+    std::string sessionKey = std::string((char*)sessionKeyData.bytes, sessionKeyData.length);
+    client->setSessionKey(sessionKey);
+    return [NSNumber numberWithBool:TRUE];
+}
+
+- (NSString *)getName {
+    return METHOD_SET_SESSION_KEY;
 }
 @end
 

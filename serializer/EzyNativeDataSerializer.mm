@@ -8,6 +8,7 @@
 
 #import "EzyNativeDataSerializer.h"
 #include "EzyHeaders.h"
+#import "../util/NSByteArray.h"
 #import "../util/EzyNativeStrings.h"
 
 EZY_USING_NAMESPACE;
@@ -75,6 +76,9 @@ EZY_USING_NAMESPACE::entity;
             return [NSNumber numberWithUnsignedLong:((EzyPrimitive*)value)->getUInt()];
         case TypeString:
             return [NSString stringWithUTF8String:((EzyString*)value)->getString().c_str()];
+        case TypeByteArray:
+            return [NSByteArray byteArrayWithCharArray:((EzyByteArray*)value)->getData().c_str()
+                                                  size:(int)((EzyByteArray*)value)->getData().size()];
         case TypeDict:
             return [self toWritableMap:value];
         case TypeArray:

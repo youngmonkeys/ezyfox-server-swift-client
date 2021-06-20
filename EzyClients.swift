@@ -25,6 +25,10 @@ class EzyClients {
         clients = [String : EzyClient]()
     }
     
+    public func newClient(config: EzyClientConfig) -> EzyClient {
+        return newClient(config: config.toDictionary())
+    }
+    
     public func newClient(config: NSDictionary) -> EzyClient {
         let client =  EzyClient(config: config)
         self.addClient(client : client)
