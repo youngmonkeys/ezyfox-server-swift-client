@@ -53,14 +53,14 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
     
     public override func handle(event: NSDictionary) {
         self.sendHandshakeRequest()
-        self.postHandle();
+        self.postHandle()
     }
     
     public func postHandle() -> Void {
     }
     
     public func sendHandshakeRequest() -> Void {
-        let request = newHandshakeRequest();
+        let request = newHandshakeRequest()
         self.client!.send(cmd: EzyCommand.HANDSHAKE, data: request)
     }
     
@@ -83,7 +83,7 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
         if(client!.enableSSL) {
             let keyPair = EzyRSAProxy.getInstance().generateKeyPair()
             client?.privateKey = keyPair.privateKey
-            return keyPair.publicKey;
+            return keyPair.publicKey
         }
         return nil
     }
@@ -109,22 +109,32 @@ public class EzyConnectionFailureHandler : EzyAbstractEventHandler {
         let reconnectConfig = config["reconnect"] as! NSDictionary
         let should = self.shouldReconnect(event: event)
         let reconnectEnable = reconnectConfig["enable"] as! Bool
-        let mustReconnect = reconnectEnable && should;
-        var reconnecting = false;
+        let mustReconnect = reconnectEnable && should
+        var reconnecting = false
         self.client!.setStatus(status: EzyConnectionStatus.FAILURE)
         if(mustReconnect) {
             reconnecting = client!.reconnect()
         }
-        if(!reconnecting) {
-            self.control(event: event)
+        if(reconnecting) {
+            self.onReconnecting(event: event)
         }
+        else {
+            self.onConnectionFailed(event: event)
+        }
+        postHandle(event: event)
     }
     
     public func shouldReconnect(event: NSDictionary) -> Bool {
-        return true;
+        return true
     }
     
-    public func control(event: NSDictionary) -> Void {
+    public func onReconnecting(event: NSDictionary) -> Void {
+    }
+    
+    public func onConnectionFailed(event: NSDictionary) -> Void {
+    }
+    
+    public func postHandle(event: NSDictionary) -> Void {
     }
     
 }
@@ -143,15 +153,19 @@ public class EzyDisconnectionHandler : EzyAbstractEventHandler {
         let mustReconnect = reconnectEnable &&
             reason != EzyDisconnectReason.UNAUTHORIZED &&
             reason != EzyDisconnectReason.CLOSE &&
-            should;
-        var reconnecting = false;
-        self.client!.setStatus(status: EzyConnectionStatus.DISCONNECTED);
+            should
+        var reconnecting = false
+        self.client!.setStatus(status: EzyConnectionStatus.DISCONNECTED)
         if(mustReconnect) {
-            reconnecting = client!.reconnect();
+            reconnecting = client!.reconnect()
         }
-        if(!reconnecting) {
-            self.control(event: event);
+        if(reconnecting) {
+            self.onReconnecting(event: event)
         }
+        else {
+            self.onDisconnected(event: event)
+        }
+        postHandle(event: event)
     }
     
     public func preHandle(event: NSDictionary) -> Void {
@@ -160,12 +174,15 @@ public class EzyDisconnectionHandler : EzyAbstractEventHandler {
     public func shouldReconnect(event: NSDictionary) -> Bool {
         let reason = event["reason"] as! Int
         if(reason == EzyDisconnectReason.ANOTHER_SESSION_LOGIN) {
-            return false;
+            return false
         }
-        return true;
+        return true
     }
     
-    public func control(event : NSDictionary) -> Void {
+    public func onReconnecting(event : NSDictionary) -> Void {
+    }
+    
+    public func onDisconnected(event : NSDictionary) -> Void {
     }
     
     public func postHandle(event: NSDictionary) -> Void {
@@ -181,24 +198,24 @@ public class EzyPongHandler : EzyAbstractDataHandler {
 public class EzyHandshakeHandler : EzyAbstractDataHandler {
     
     public override func handle(data: NSArray) -> Void {
-        self.startPing();
+        self.startPing()
         if(self.doHandle(data: data)) {
             self.handleLogin()
         }
-        self.postHandle(data: data);
+        self.postHandle(data: data)
     }
     
     public func doHandle(data: NSArray) -> Bool {
         client?.sessionToken = data[1] as? String
         client?.sessionId = data[2] as? Int64
         if(client!.enableSSL) {
-            let sessionKey = decrypteSessionKey(encyptedSessionKey: data[3]);
+            let sessionKey = decrypteSessionKey(encyptedSessionKey: data[3])
             if(sessionKey == nil) {
-                return false;
+                return false
             }
             client!.setSessionKey(sessionKey: sessionKey!)
         }
-        return true;
+        return true
     }
     
     public func decrypteSessionKey(encyptedSessionKey: Any) -> Data? {
@@ -206,7 +223,7 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
             if(client!.enableDebug) {
                 return Data()
             }
-            EzyLogger.error(msg: "maybe server was not enable SSL, you must enable SSL on server or disable SSL on your client or enable debug mode");
+            EzyLogger.error(msg: "maybe server was not enable SSL, you must enable SSL on server or disable SSL on your client or enable debug mode")
             client?.close()
             return nil
         }
@@ -218,16 +235,16 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
     }
     
     public func handleLogin() -> Void {
-        let loginRequest = self.getLoginRequest();
-        self.client!.send(cmd: EzyCommand.LOGIN, data: loginRequest, encrypted: encryptedLoginRequest());
+        let loginRequest = self.getLoginRequest()
+        self.client!.send(cmd: EzyCommand.LOGIN, data: loginRequest, encrypted: encryptedLoginRequest())
     }
     
     public func encryptedLoginRequest() -> Bool {
-        return false;
+        return false
     }
     
     public func getLoginRequest() -> NSArray {
-        let array = NSMutableArray();
+        let array = NSMutableArray()
         array.add("test")
         array.add("test")
         array.add("test")
@@ -236,7 +253,7 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
     }
     
     public func startPing() -> Void {
-        self.client!.startPingSchedule();
+        self.client!.startPingSchedule()
     }
 }
 
@@ -244,27 +261,27 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
 public class EzyLoginSuccessHandler : EzyAbstractDataHandler {
     
     public override func handle(data: NSArray) -> Void {
-        let responseData = data[4] as! NSObject;
-        let user = newUser(data: data);
-        let zone = newZone(data: data);
-        self.client!.me = user;
-        self.client!.zone = zone;
-        self.handleLoginSuccess(responseData: responseData);
-        EzyLogger.info(msg: "user: \(user.name) logged in successfully");
+        let responseData = data[4] as! NSObject
+        let user = newUser(data: data)
+        let zone = newZone(data: data)
+        self.client!.me = user
+        self.client!.zone = zone
+        self.handleLoginSuccess(responseData: responseData)
+        EzyLogger.info(msg: "user: \(user.name) logged in successfully")
     }
     
     public func newUser(data: NSArray) -> EzyUser {
-        let userId = data[2] as! Int64;
-        let username = data[3] as! String;
-        let user = EzyUser(id: userId, name: username);
-        return user;
+        let userId = data[2] as! Int64
+        let username = data[3] as! String
+        let user = EzyUser(id: userId, name: username)
+        return user
     }
     
     public func newZone(data: NSArray) -> EzyZone {
-        let zoneId = data[0] as! Int;
-        let zoneName = data[1] as! String;
-        let zone = EzyZone(client: self.client!, id: zoneId, name: zoneName);
-        return zone;
+        let zoneId = data[0] as! Int
+        let zoneName = data[1] as! String
+        let zone = EzyZone(client: self.client!, id: zoneId, name: zoneName)
+        return zone
     }
     
     public func handleLoginSuccess(responseData: NSObject) -> Void {
@@ -276,8 +293,8 @@ public class EzyLoginSuccessHandler : EzyAbstractDataHandler {
 public class EzyLoginErrorHandler : EzyAbstractDataHandler {
     
     public override func handle(data: NSArray) -> Void {
-        self.client!.disconnect(reason: 401);
-        self.handleLoginError(data: data);
+        self.client!.disconnect(reason: EzyDisconnectReason.UNAUTHORIZED)
+        self.handleLoginError(data: data)
     }
     
     public func handleLoginError(data: NSArray) -> Void {
@@ -314,8 +331,8 @@ public class EzyAppExitHandler : EzyAbstractDataHandler {
     public override func handle(data: NSArray) -> Void {
         let zone = self.client!.zone
         let appManager = zone!.appManager
-        let appId = data[0] as! Int;
-        let reasonId = data[1] as! Int;
+        let appId = data[0] as! Int
+        let reasonId = data[1] as! Int
         let app = appManager.removeApp(appId: appId)
         if(app != nil) {
             self.postHandle(app: app!, data: data)
@@ -337,8 +354,8 @@ public class EzyAppResponseHandler : EzyAbstractDataHandler {
         
         let app = self.client?.getAppById(appId: appId)!
         if(app == nil) {
-            EzyLogger.info(msg: "receive message when has not joined app yet");
-            return;
+            EzyLogger.info(msg: "receive message when has not joined app yet")
+            return
         }
         let handler = app!.getDataHandler(cmd: cmd)
         if(handler != nil) {
@@ -362,7 +379,7 @@ public class EzyEventHandlers {
     
     public func addHandler(eventType: String, handler: EzyEventHandler) {
         let abs = handler as! EzyAbstractEventHandler
-        abs.client = self.client;
+        abs.client = self.client
         self.handlers[eventType] = handler
     }
     
