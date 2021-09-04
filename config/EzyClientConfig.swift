@@ -13,6 +13,8 @@ public class EzyClientConfig {
     var clientName: String?
     var zoneName: String?
     var enableDebug: Bool?
+    var ping: EzyPingConfig = EzyPingConfig()
+    var reconnect: EzyReconnectConfig = EzyReconnectConfig()
     
     func setClientName(clientName: String) -> EzyClientConfig {
         self.clientName = clientName
@@ -34,6 +36,16 @@ public class EzyClientConfig {
         return self
     }
     
+    func setPing(ping: EzyPingConfig) -> EzyClientConfig {
+        self.ping = ping
+        return self
+    }
+    
+    func setReconnect(reconnect: EzyReconnectConfig) -> EzyClientConfig {
+        self.reconnect = reconnect
+        return self
+    }
+    
     func getClientName() -> String {
         if(clientName != nil) {
             return clientName!
@@ -50,6 +62,8 @@ public class EzyClientConfig {
         dict["zoneName"] = zoneName
         dict["enableSSL"] = enableSSL
         dict["enableDebug"] = enableDebug
+        dict["ping"] = ping.toDictionary()
+        dict["reconnect"] = reconnect.toDictionary()
         return dict
     }
     
