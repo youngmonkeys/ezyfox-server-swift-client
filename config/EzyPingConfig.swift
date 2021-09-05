@@ -11,7 +11,7 @@ import Foundation
 public class EzyPingConfig {
 
     var pingPeriod: Int = 3000
-    var maxLostPingCount: Int = 3000
+    var maxLostPingCount: Int = 5
     
     func setPingPeriod(pingPeriod: Int) -> EzyPingConfig {
         self.pingPeriod = pingPeriod
