@@ -52,7 +52,7 @@ EZY_USING_NAMESPACE::event;
     EzyLostPingEvent* mevent = (EzyLostPingEvent*)event;
     NSDictionary* dict = [NSMutableDictionary dictionary];
     int count = mevent->getCount();
-    [dict setValue:[NSNumber numberWithInt:count] forKey:@"reason"];
+    [dict setValue:[NSNumber numberWithInt:count] forKey:@"count"];
     return dict;
 }
 
@@ -60,7 +60,7 @@ EZY_USING_NAMESPACE::event;
     EzyTryConnectEvent* mevent = (EzyTryConnectEvent*)event;
     NSDictionary* dict = [NSMutableDictionary dictionary];
     int count = mevent->getCount();
-    [dict setValue:[NSNumber numberWithInt:count] forKey:@"reason"];
+    [dict setValue:[NSNumber numberWithInt:count] forKey:@"count"];
     return dict;
 }
 
