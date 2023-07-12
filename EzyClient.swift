@@ -11,6 +11,7 @@ import Foundation
 public class EzyClient {
     
     public let enableSSL    : Bool
+    public let sslType      : Int
     public let enableDebug  : Bool
     public let config       : NSDictionary
     public let name         : String
@@ -33,6 +34,7 @@ public class EzyClient {
         self.config = result as! NSDictionary;
         self.name = self.config["clientName"] as! String
         self.enableSSL = config["enableSSL"] != nil ? config["enableSSL"] as! Bool : false
+        self.sslType = config["sslType"] != nil ? config["sslType"] as! Int : EzySslType.L7;
         self.enableDebug = config["enableDebug"] != nil ? config["enableDebug"] as! Bool : false
         self.zone = nil
         self.me = nil
@@ -77,7 +79,7 @@ public class EzyClient {
     
     public func send(cmd: String, data: NSArray, encrypted: Bool = false) -> Void {
         var shouldEncrypted = encrypted;
-        if(encrypted && sessionKey == nil) {
+        if(isEnableL7SSL() && sessionKey == nil) {
             if(enableDebug) {
                 shouldEncrypted = false;
             }
@@ -145,5 +147,9 @@ public class EzyClient {
     public func handleData(command: String, data: NSArray) -> Void {
         let dataHandlers = self.handlerManager!.dataHandlers
         dataHandlers!.handle(cmd: command, data: data)
+    }
+
+    public func isEnableL7SSL() -> Bool {
+        return enableSSL && sslType == EzySslType.L7;
     }
 }

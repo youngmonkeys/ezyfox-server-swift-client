@@ -208,7 +208,7 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
     public func doHandle(data: NSArray) -> Bool {
         client?.sessionToken = data[1] as? String
         client?.sessionId = data[2] as? Int64
-        if(client!.enableSSL) {
+        if(client!.isEnableL7SSL()) {
             let sessionKey = decrypteSessionKey(encyptedSessionKey: data[3])
             if(sessionKey == nil) {
                 return false
