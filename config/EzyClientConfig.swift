@@ -10,7 +10,7 @@ import Foundation
 public class EzyClientConfig {
     
     var enableSSL: Bool?
-    var sslType: Int = EzySslType.L4;
+    var sslType: Int = EzySslType.CERTIFICATION;
     var clientName: String?
     var zoneName: String?
     var enableDebug: Bool?

@@ -11,8 +11,8 @@ import Foundation
 public final class EzySslType {
     private init() {}
 
-    public static let L4 = 0
-    public static let L7 = 1;
+    public static let CERTIFICATION = 0
+    public static let CUSTOMIZATION = 1;
 }
 
 public final class EzyCommand {
