@@ -240,7 +240,7 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
     }
     
     public func encryptedLoginRequest() -> Bool {
-        return false
+        return self.client!.enableSSL;
     }
     
     public func getLoginRequest() -> NSArray {
