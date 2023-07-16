@@ -79,7 +79,7 @@ public class EzyClient {
     
     public func send(cmd: String, data: NSArray, encrypted: Bool = false) -> Void {
         var shouldEncrypted = encrypted;
-        if(isEnableEncryption() && sessionKey == nil) {
+        if(encrypted && sessionKey == nil) {
             if(enableDebug) {
                 shouldEncrypted = false;
             }
