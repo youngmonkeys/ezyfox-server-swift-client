@@ -80,7 +80,7 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
     }
     
     public func generateClientKey() -> String? {
-        if(client!.enableSSL) {
+        if(client!.isEnableEncryption()) {
             let keyPair = EzyRSAProxy.getInstance().generateKeyPair()
             client?.privateKey = keyPair.privateKey
             return keyPair.publicKey
