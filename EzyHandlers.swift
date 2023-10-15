@@ -80,7 +80,7 @@ public class EzyConnectionSuccessHandler : EzyAbstractEventHandler {
     }
     
     public func generateClientKey() -> String? {
-        if(client!.enableSSL) {
+        if(client!.isEnableEncryption()) {
             let keyPair = EzyRSAProxy.getInstance().generateKeyPair()
             client?.privateKey = keyPair.privateKey
             return keyPair.publicKey
@@ -208,7 +208,7 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
     public func doHandle(data: NSArray) -> Bool {
         client?.sessionToken = data[1] as? String
         client?.sessionId = data[2] as? Int64
-        if(client!.enableSSL) {
+        if(client!.isEnableEncryption()) {
             let sessionKey = decrypteSessionKey(encyptedSessionKey: data[3])
             if(sessionKey == nil) {
                 return false
@@ -240,7 +240,7 @@ public class EzyHandshakeHandler : EzyAbstractDataHandler {
     }
     
     public func encryptedLoginRequest() -> Bool {
-        return self.client!.enableSSL;
+        return self.client!.isEnableEncryption();
     }
     
     public func getLoginRequest() -> NSArray {

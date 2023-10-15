@@ -8,6 +8,13 @@
 
 import Foundation
 
+public final class EzySslType {
+    private init() {}
+
+    public static let CERTIFICATION = 0
+    public static let CUSTOMIZATION = 1;
+}
+
 public final class EzyCommand {
     private init() {}
     

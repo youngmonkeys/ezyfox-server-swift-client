@@ -10,6 +10,7 @@ import Foundation
 public class EzyClientConfig {
     
     var enableSSL: Bool?
+    var sslType: Int = EzySslType.CERTIFICATION;
     var clientName: String?
     var zoneName: String?
     var enableDebug: Bool?
@@ -29,6 +30,11 @@ public class EzyClientConfig {
     func setEnableSSL(enableSSL: Bool = true) -> EzyClientConfig {
         self.enableSSL = enableSSL
         return self
+    }
+
+    func setSslType(sslType: Int) -> EzyClientConfig {
+        self.sslType = sslType;
+        return self;
     }
     
     func setEnableDebug(enableDebug: Bool = true) -> EzyClientConfig {
@@ -61,6 +67,7 @@ public class EzyClientConfig {
         dict["clientName"] = getClientName()
         dict["zoneName"] = zoneName
         dict["enableSSL"] = enableSSL
+        dict["sslType"] = sslType;
         dict["enableDebug"] = enableDebug
         dict["ping"] = ping.toDictionary()
         dict["reconnect"] = reconnect.toDictionary()
